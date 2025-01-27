@@ -8,10 +8,11 @@ const path = require('path');
 const webpackConfig = require('../webpack.config');
 const compiler = webpack(webpackConfig);
 const server = express();
-const apiRouter = require('./routes/apiRouter');
 
-require('dotenv').config({ path: path.join(__dirname, '/secrets/.env') });
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const config = loader();
+
+const apiRouter = require('./routes/apiRouter')(config);
 
 server.use(cors());
 server.use(webpackDevMiddleware(compiler, { writeToDisk: true }));
@@ -25,4 +26,4 @@ server.use('/api', apiRouter);
 server.use('/*', (req, res) => res.render('index'));
 
 
-server.listen(config.PORT, () => console.log(`Listening on port ${config.PORT}`));
+server.listen(config.CLIENT_PORT, () => console.log(`Listening on port ${config.CLIENT_PORT}`));

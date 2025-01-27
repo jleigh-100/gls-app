@@ -1,36 +1,60 @@
 #!/bin/bash
 echo "Setting up the project..."
 
-echo "By default, this project runs on port 3000."
-echo "If you would like to change it, enter a new port number, otherwise leave blank:"
-read -p "" newport
+echo "By default, this project's frontend runs on port 3000 and db runs on port 27017."
+echo "If you would like to change the frontend's port, enter a new port number, otherwise leave blank:"
+read -p "" newclientport
 
-if [[ ! -z "$newport" && $((newport)) != $newport ]]; then
+echo "If you would like to change the port the Database runs on, enter a new port number, otherwise leave blank:"
+read -p "" newserverport
+
+if [[ ! -z "$newclientport" && $((newclientport)) != $newclientport ]]; then
     echo ""
     echo "!!!!!!!!!!!!!!!!"
     echo "! Setup failed !"
     echo "!!!!!!!!!!!!!!!!"
     echo ""
-    echo "The port can only contain numbers."
+    echo "The ports can only contain numbers."
     echo "Please run this script again."
     echo ""
     exit
 fi
 
-if [ -z "$newport" ]; then
-    echo "Port will remain 3000"
-    newport=3000
-else    
-    echo "Changing port to $newport..."
+if [[ ! -z "$newserverport" && $((newserverport)) != $newserverport ]]; then
+    echo ""
+    echo "!!!!!!!!!!!!!!!!"
+    echo "! Setup failed !"
+    echo "!!!!!!!!!!!!!!!!"
+    echo ""
+    echo "The ports can only contain numbers."
+    echo "Please run this script again."
+    echo ""
+    exit
 fi
 
-if ! [ -f server/secrets/.env ]; then # if .env file doesn't exist, create it
-    touch server/secrets/.env
-    echo "PORT=$newport" > server/secrets/.env
-else # otherwise replace the port number
-    sed -i "" -E "s/PORT=.*/PORT=$newport/" server/secrets/.env
+if [ -z "$newclientport" ]; then
+    echo "Client port will remain 3000"
+    newclientport=3000
+else    
+    echo "Changing port to $newclientport..."
 fi
-echo "Port is now set to $newport"
+
+if [ -z "$newserverport" ]; then
+    echo "Server port will remain 27017"
+    newserverport=27017
+else    
+    echo "Changing port to $newserverport..."
+fi
+
+if ! [ -f .env ]; then # if .env file doesn't exist, create it
+    touch .env
+    echo "CLIENT_PORT=$newclientport" >> .env
+    echo "SERVER_PORT=$newserverport" >> .env
+else # otherwise replace the port number
+    sed -i "" -E "s/CLIENT_PORT=.*/CLIENT_PORT=$newclientport/" .env
+    sed -i "" -E "s/SERVER_PORT=.*/SERVER_PORT=$newserverport/" .env
+fi
+echo "Ports have now been set to $newclientport and $newserverport."
 
 echo "Installing dependencies..."
 echo "--------------------------------------------------------------------------"

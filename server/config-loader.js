@@ -1,9 +1,9 @@
 const config = require('./config.json');
-const env = process.env;
 
 const loader = () => {
+    const env = process.env;
     const envConfig = { ...config };
-    const allowedKeys = ['PORT'];
+    const allowedKeys = ['CLIENT_PORT', 'SERVER_PORT'];
     for (const key of allowedKeys) {
         if (env[key]) {
             envConfig[key] = env[key];

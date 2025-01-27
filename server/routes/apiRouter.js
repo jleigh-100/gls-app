@@ -1,9 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const router = express.Router();
 
-// MongoDB URI (use the one from Docker Compose)
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://root:rootpassword@localhost:27017/gls-app?authSource=admin';
+module.exports = (config) => {
+  const router = express.Router();
+
+const MONGO_URI = `mongodb://root:rootpassword@localhost:${config.SERVER_PORT}/gls-app?authSource=admin`;
 
 mongoose.connect(MONGO_URI)
   .then(() => {
@@ -79,5 +80,5 @@ router.get('/opportunities/:id', async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   });
-
-module.exports = router;
+  return router;
+}
