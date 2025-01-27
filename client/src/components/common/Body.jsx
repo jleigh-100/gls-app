@@ -73,7 +73,7 @@ const Body = () => {
             ))}
           </tbody>
         </StyledTable>
-        {selectedOpp && <EditOppModal opportunity={selectedOpp} />}
+        {selectedOpp && <EditOppModal opportunity={selectedOpp} setSelectedOpp={setSelectedOpp} />}
       </Container>
     )
 }

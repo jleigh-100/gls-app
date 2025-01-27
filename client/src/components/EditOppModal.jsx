@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { Calendar } from '../components/common/Calendar.jsx';
 import styled from 'styled-components';
+import { formatDate } from './utils/index.jsx';
 
 const Overlay = styled.div`
   position: fixed;
@@ -16,6 +18,9 @@ const Overlay = styled.div`
 const Modal = styled.div`
   background: lightgrey;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   border-radius: 10px;
   border: 5px solid black;
   height: 500px;
@@ -54,20 +59,32 @@ const Dropdown = styled.div`
 
 const DropdownContainer = styled.div`
   position: absolute;
+  width: calc(200px + 6px);
   z-index: 1;
 `;
 
 const DropdownOption = styled.div`
   background-color: ${props => props.selected ? "grey" : "#f9f9f9"};
-  min-width: 160px;
+  width: calc(100% - 32px);
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  padding: 12px 16px;
+  padding: 5px 16px;
   z-index: 1;
 `;
 
-export const EditOppModal = ({opportunity}) => {
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const typeOptions = ["Open", "Handover", "Cover"];
+const statusOptions = ["Open", "In Progress", "Closed"];
+
+export const EditOppModal = ({ opportunity, setSelectedOpp }) => {
   const [newOpp, setNewOpp] = useState(opportunity);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showEndDateCalendar, setShowEndDateCalendar] = useState(false);
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [showStartDateCalendar, setShowStartDateCalendar] = useState(false);
 
   const handleSubmit = () => {
     console.log(newOpp);
@@ -79,6 +96,7 @@ export const EditOppModal = ({opportunity}) => {
         },
         body: JSON.stringify(newOpp)
       });
+      setSelectedOpp(null);
     }
     catch (e) {
       console.log(e);
@@ -86,85 +104,111 @@ export const EditOppModal = ({opportunity}) => {
   }
 
   const handleChange = (e) => {
-    console.log(e)
     setNewOpp({
       ...newOpp,
       [e.target.name]: e.target.value
     });
   }
 
-  const handleDropdownClick = () => {
-    setShowDropdown(!showDropdown);
-  }
-
-  const handleStatusClick = (e) => {
+  const handleDropdownOptionClick = (type, e) => {
     setNewOpp({
       ...newOpp,
-      status: e.target.innerText
+      [type]: e.target.innerText
     });
-    setShowDropdown(false);
+    setShowStatusDropdown(false);
+    setShowTypeDropdown(false);
+  };
+
+  const handleCalendarChange = (type, e) => {
+    setNewOpp({
+      ...newOpp,
+      [type]: formatDate(e)
+    });
+    setShowEndDateCalendar(false);
   }
+
 
   return (
     <Overlay>
       <Modal>
-      <h1>Edit Opportunity</h1>
-      <GroupContainer>
-        <p>Title</p>
-        <StyledInput name="title" onChange={handleChange} value={newOpp.title}></StyledInput>
-      </GroupContainer>
+        <div>
+          <h1 style={{ textAlign: "center" }}>Edit Opportunity</h1>
+          <GroupContainer>
+            <p>Title</p>
+            <StyledInput name="title" onChange={handleChange} value={newOpp.title}></StyledInput>
+          </GroupContainer>
 
-      <GroupContainer>
-        <p>Description</p>
-        <StyledInput name="description" onChange={handleChange} value={newOpp.description}></StyledInput>
-      </GroupContainer>
+          <GroupContainer>
+            <p>Description</p>
+            <StyledInput name="description" onChange={handleChange} value={newOpp.description}></StyledInput>
+          </GroupContainer>
 
-      <GroupContainer>
-        <p>Status</p>
-        <Dropdown>
-          <button onClick={() => handleDropdownClick()}>{newOpp.status}</button>
-          { 
-          showDropdown &&
-            <DropdownContainer>
-            <DropdownOption selected={newOpp.status === "Open"} onClick={handleStatusClick}>Open</DropdownOption>
-            <DropdownOption selected={newOpp.status === "Handover"} onClick={handleStatusClick}>Handover</DropdownOption>
-            <DropdownOption selected={newOpp.status === "Change"} onClick={handleStatusClick}>Change</DropdownOption>
-          </DropdownContainer>
-        }
-        </Dropdown>
-      </GroupContainer>
+          <GroupContainer>
+            <p>Status</p>
+            <Dropdown>
+              <button style={{ width: 206 }} onClick={() => setShowStatusDropdown(true)}>{newOpp.status}</button>
+              {
+                showStatusDropdown &&
+                <DropdownContainer>
+                  {statusOptions.map(status => (
+                    <DropdownOption
+                      selected={newOpp.status === status}
+                      onClick={(e) => handleDropdownOptionClick('status', e)}>
+                      {status}
+                    </DropdownOption>
+                  ))}
+                </DropdownContainer>
+              }
+            </Dropdown>
+          </GroupContainer>
 
-      <GroupContainer>
-        <p>Customer Name</p>
-        <StyledInput name="customerName" onChange={handleChange} value={newOpp.customerName}></StyledInput>
-      </GroupContainer>
+          <GroupContainer>
+            <p>Customer Name</p>
+            <StyledInput name="customerName" onChange={handleChange} value={newOpp.customerName}></StyledInput>
+          </GroupContainer>
 
-      <GroupContainer>
-        <p>Type</p>
-        <StyledInput name="type" onChange={handleChange} value={newOpp.opportunityType}></StyledInput>
-      </GroupContainer>
+          <GroupContainer>
+            <p>Type</p>
+            <Dropdown>
+              <button style={{ width: 206 }} onClick={() => setShowTypeDropdown(true)}>{newOpp.opportunityType}</button>
+              {
+                showTypeDropdown &&
+                <DropdownContainer>
+                  {typeOptions.map(type => (
+                    <DropdownOption
+                      selected={newOpp.opportunityType === type}
+                      onClick={(e) => handleDropdownOptionClick('opportunityType', e)}>
+                      {type}
+                    </DropdownOption>
+                  ))}
+                </DropdownContainer>
+              }
+            </Dropdown>
+          </GroupContainer>
+          {newOpp.opportunityType !== 'Open' && <GroupContainer>
+            <p>Start Date</p>
+            <StyledInput
+              value={newOpp.startDate || ''}
+              onClick={() => { setShowStartDateCalendar(true) }}
+            ></StyledInput>
+            {showStartDateCalendar && <Calendar onChange={(e) => handleCalendarChange('startDate', e)} />}
+          </GroupContainer>
+          }
 
-      <GroupContainer>
-        <p>Start Date</p>
-        <StyledInput
-          name="startDate"
-          onChange={handleChange}
-          value={newOpp.startDate}
-          disabled={newOpp.opportunityType !== 'Help'}
-          ></StyledInput>
-      </GroupContainer>
-
-      <GroupContainer>
-        <p>End Date</p>
-        <StyledInput
-          name="endDate"
-          onChange={handleChange}
-          value={newOpp.endDate}
-          disabled={newOpp.opportunityType !== 'Cover'}
-        ></StyledInput>
-      </GroupContainer>
-
-      <button onClick={handleSubmit}>Save</button>
+          {newOpp.opportunityType === 'Cover' && <GroupContainer>
+            <p>End Date</p>
+            <StyledInput
+              value={newOpp.endDate || ''}
+              onClick={() => { setShowEndDateCalendar(true) }}
+            ></StyledInput>
+            {showEndDateCalendar && <Calendar onChange={(e) => handleCalendarChange('endDate', e)} />}
+          </GroupContainer>
+          }
+        </div>
+        <ButtonContainer>
+          <button onClick={() => setSelectedOpp(null)}>Close</button>
+          <button onClick={handleSubmit}>Save</button>
+        </ButtonContainer>
       </Modal>
     </Overlay>
   );
