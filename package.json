@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server/index.js",
-    "build": "webpack --mode production",
-    "dev": "webpack-dev-server --mode development --open --hot --port 3000"
+    "start": "npm run start:db && npm run start:client",
+    "start:client": "nodemon server/index.js",
+    "start:db": "docker compose up -d",
+    "build": "webpack --mode production"
   },
   "author": "",
   "license": "ISC",
