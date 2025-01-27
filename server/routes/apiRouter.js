@@ -31,7 +31,16 @@ router.get('/opportunities', (req, res) => {
     // TODO: Link to database
 });
 
-router.put('/opportunities/:id', (req, res) => {
+router.post('/opportunities', (req, res) => { // add a new opportunity
+    // write to DB
+    const { id } = req.params;
+    const data = req.body;
+    console.log(`Saving new opportunity with id ${id}`);
+    console.log(data);
+    res.json({ message: 'Opportunity Saved' });
+});
+
+router.put('/opportunities/:id', (req, res) => { // update an opportunity
     // write to DB
     const { id } = req.params;
     const data = req.body;
@@ -39,6 +48,5 @@ router.put('/opportunities/:id', (req, res) => {
     console.log(data);
     res.json({ message: 'Opportunity updated' });
 });
-
 
 module.exports = router;
