@@ -1,9 +1,15 @@
 services:
-  client:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
     ports:
-      - 3000:3000
+      - "27017:27017"
     volumes:
-      - .:/usr/src/app
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=rootpassword
+      - MONGO_INITDB_DATABASE=opportunitiesdb
+    
+volumes:
+  mongo_data:

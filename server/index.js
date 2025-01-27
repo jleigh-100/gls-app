@@ -25,5 +25,4 @@ server.use('/api', apiRouter);
 server.use('/*', (req, res) => res.render('index'));
 
 
-
 server.listen(config.PORT, () => console.log(`Listening on port ${config.PORT}`));

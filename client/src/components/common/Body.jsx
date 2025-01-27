@@ -9,7 +9,7 @@ const Container = styled.div`
 
 const StyledTable = styled.table`
   border-collapse: collapse;
-  height: ${props => props.noOfOps < 10 ? `${props.noOfOps * 100}px` : "100%"};
+  height: ${props => props.opps < 10 ? `${props.opps * 100}px` : "100%"};
   width: 100%;
   td {
     text-align: center;
@@ -57,12 +57,12 @@ const Body = () => {
     };
     
     fetchData();
-  }, []);
+  }, [selectedOpp]);
 
 
     return (
       <Container>
-        <StyledTable noOfOps={opportunities.length}>
+        <StyledTable opps={opportunities.length}>
           <thead>
             <tr>
               <th>Title</th>
