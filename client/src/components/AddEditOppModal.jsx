@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Calendar } from '../components/common/Calendar.jsx';
+import { Calendar } from './common/Calendar.jsx';
 import styled from 'styled-components';
 import { formatDate } from './utils/index.jsx';
 
@@ -16,7 +16,7 @@ const Overlay = styled.div`
 `;
 
 const Modal = styled.div`
-  margin-top: 100px;
+  margin-top: 50px;
   background: lightgrey;
   padding: 20px;
   display: flex;
@@ -89,9 +89,9 @@ const emptyOpp = {
   startDate: "",
   endDate: ""
 };
-
-const putUrl = `http://localhost:3000/api/opportunities/:id`;
-const postUrl = `http://localhost:3000/api/opportunities`;
+const port = window.location.port;
+const putUrl = `http://localhost:${port}/api/opportunities/:id`;
+const postUrl = `http://localhost:${port}/api/opportunities`;
 
 export const AddEditOppModal = ({ opportunity, setSelectedOpp }) => {
   const addMode = typeof opportunity === 'boolean';
@@ -113,10 +113,11 @@ export const AddEditOppModal = ({ opportunity, setSelectedOpp }) => {
     return basics;
   }, [newOpp]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    console.log(newOpp)
     try {
-      const url = addMode ? postUrl : putUrl.replace(':id', newOpp.id);
-      fetch(url, {
+      const url = addMode ? postUrl : putUrl.replace(':id', newOpp._id);
+      await fetch(url, {
         method: addMode ? "POST" : "PUT",
         headers: {
           'Content-Type': 'application/json'

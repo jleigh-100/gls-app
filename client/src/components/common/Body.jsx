@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { AddEditOppModal } from "../EditOppModal.jsx";
+import { AddEditOppModal } from "../AddEditOppModal.jsx";
 
 const Container = styled.div`
   display: flex;
@@ -19,16 +19,15 @@ const StyledTable = styled.table`
     &:not(:first-child) {
       border-top: 1px solid black;
     }
-  &:nth-child(even) {
-    background-color: lightgrey;
+  &:nth-child(odd) {
+    background: lightgrey;
   }
   &:last-child {
-    background-color: white;
+    background: white;
   }
 `;
 
 const StyledRow = styled.tr`
-  background-color: grey;
   > td {
     border: 1px solid black;
   }
@@ -39,15 +38,22 @@ const StyledAddButton = styled.button`
   height: 75%;
 `;
 
+const CollapsibleSection = styled.div`
+  display: ${props => (props.isOpen ? 'block' : 'none')};
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+`;
 
 const Body = () => {
   const [opportunities, setOpportunities] = useState([]);
   const [selectedOpp, setSelectedOpp] = useState(null);
+  const [openRow, setOpenRow] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const opportunities = await fetch("http://localhost:3000/api/opportunities");
+        const opportunities = await fetch(`http://localhost:${window.location.port}/api/opportunities`);
         const response = await opportunities.json();
         console.log(response);
         setOpportunities(response);
@@ -59,41 +65,58 @@ const Body = () => {
     fetchData();
   }, [selectedOpp]);
 
+  const toggleRow = (index) => {
+    setOpenRow(openRow === index ? null : index);
+  };
 
-    return (
-      <Container>
-        <StyledTable opps={opportunities.length}>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Customer Name</th>
-              <th>Type</th>
-              <th>Created At</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {opportunities.map((opportunity, index) => (
-              <StyledRow key={index}>
-                <td>{opportunity.title}</td>
-                <td>{opportunity.status}</td>
-                <td>{opportunity.customerName}</td>
-                <td>{opportunity.opportunityType}</td>
-                <td>{opportunity.createdAt}</td>
-                <td onClick={() => setSelectedOpp(opportunity)}>edit</td>
+  return (
+    <Container>
+      <StyledTable opps={opportunities.length}>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Customer Name</th>
+            <th>Opportunity Type</th>
+            <th>Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {opportunities.map((opp, index) => (
+            <React.Fragment key={opp._id}>
+              <StyledRow onClick={() => toggleRow(index)}>
+                <td>{opp.title}</td>
+                <td>{opp.description}</td>
+                <td>{opp.status}</td>
+                <td>{opp.customerName}</td>
+                <td>{opp.opportunityType}</td>
+                <td onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedOpp(opp)
+                  }}>Edit</td>
               </StyledRow>
-            ))}
-            <tr>
-              <td colSpan={6}>
-                <StyledAddButton onClick={() => setSelectedOpp(true)}>Add new</StyledAddButton>
-              </td>
-            </tr>
-          </tbody>
-        </StyledTable>
-        {selectedOpp && <AddEditOppModal opportunity={selectedOpp} setSelectedOpp={setSelectedOpp} />}
-      </Container>
-    )
+              <tr style={{ display: openRow === index ? 'table-row' : 'none' }}>
+                <td colSpan="7">
+                  <CollapsibleSection isOpen={openRow === index}>
+                    <p><strong>Created At:</strong> {opp.createdAt || 'N/A'}</p>
+                    <p><strong>Updated At:</strong> {opp.updatedAt || 'N/A'}</p>
+                    <p><strong>Start Date:</strong> {opp.startDate || 'N/A'}</p>
+                  </CollapsibleSection>
+                </td>
+              </tr>
+            </React.Fragment>
+          ))}
+          <tr>
+            <td colSpan={7}>
+              <StyledAddButton onClick={() => setSelectedOpp(true)}>Add new</StyledAddButton>
+            </td>
+          </tr>
+        </tbody>
+      </StyledTable>
+      {selectedOpp && <AddEditOppModal opportunity={selectedOpp} setSelectedOpp={setSelectedOpp} />}
+    </Container>
+  )
 }
 
 export default Body;
