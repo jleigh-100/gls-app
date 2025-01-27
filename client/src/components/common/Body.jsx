@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { EditOppModal } from "../EditOppModal.jsx";
+import { AddEditOppModal } from "../EditOppModal.jsx";
 
 const Container = styled.div`
   display: flex;
@@ -9,7 +9,7 @@ const Container = styled.div`
 
 const StyledTable = styled.table`
   border-collapse: collapse;
-  height: ${props => props.noOps < 10 ? `${props.noOps * 100}px` : "100%"};
+  height: ${props => props.noOfOps < 10 ? `${props.noOfOps * 100}px` : "100%"};
   width: 100%;
   td {
     text-align: center;
@@ -49,7 +49,7 @@ const Body = () => {
 
     return (
       <Container>
-        <StyledTable noOps={opportunities.length}>
+        <StyledTable noOfOps={opportunities.length}>
           <thead>
             <tr>
               <th>Title</th>
@@ -71,9 +71,14 @@ const Body = () => {
                 <td onClick={() => setSelectedOpp(opportunity)}>edit</td>
               </StyledRow>
             ))}
+            <tr>
+              <td colSpan={6}>
+                <button style={{ width: "100%", height: "75%" }} onClick={() => setSelectedOpp(true)}>Add new</button>
+              </td>
+            </tr>
           </tbody>
         </StyledTable>
-        {selectedOpp && <EditOppModal opportunity={selectedOpp} setSelectedOpp={setSelectedOpp} />}
+        {selectedOpp && <AddEditOppModal opportunity={selectedOpp} setSelectedOpp={setSelectedOpp} />}
       </Container>
     )
 }

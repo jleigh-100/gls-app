@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Calendar } from '../components/common/Calendar.jsx';
 import styled from 'styled-components';
 import { formatDate } from './utils/index.jsx';
@@ -12,10 +12,11 @@ const Overlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: start;
 `;
 
 const Modal = styled.div`
+  margin-top: 100px;
   background: lightgrey;
   padding: 20px;
   display: flex;
@@ -28,7 +29,7 @@ const Modal = styled.div`
 `;
 
 const StyledInput = styled.input`
-  background-color: lightgrey;
+  background: lightgrey;
   border: 1px solid black;
   width: 200px;
 `;
@@ -79,18 +80,44 @@ const ButtonContainer = styled.div`
 const typeOptions = ["Open", "Handover", "Cover"];
 const statusOptions = ["Open", "In Progress", "Closed"];
 
-export const EditOppModal = ({ opportunity, setSelectedOpp }) => {
-  const [newOpp, setNewOpp] = useState(opportunity);
+const emptyOpp = {
+  title: "",
+  description: "",
+  status: "Open",
+  customerName: "",
+  opportunityType: "Open",
+  startDate: "",
+  endDate: ""
+};
+
+const putUrl = `http://localhost:3000/api/opportunities/:id`;
+const postUrl = `http://localhost:3000/api/opportunities`;
+
+export const AddEditOppModal = ({ opportunity, setSelectedOpp }) => {
+  const addMode = typeof opportunity === 'boolean';
+
+  const [newOpp, setNewOpp] = useState(addMode ? emptyOpp : opportunity);
   const [showEndDateCalendar, setShowEndDateCalendar] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showStartDateCalendar, setShowStartDateCalendar] = useState(false);
 
+  const isValid = useMemo(() => {
+    const basics = (!newOpp.title || !newOpp.description || !newOpp.customerName);
+    if (newOpp.opportunityType === 'Cover') {
+      return basics || !newOpp.endDate || !newOpp.startDate;
+    }
+    if (newOpp.opportunityType === 'Handover') {
+      return basics || !newOpp.startDate;
+    }
+    return basics;
+  }, [newOpp]);
+
   const handleSubmit = () => {
-    console.log(newOpp);
     try {
-      fetch(`http://localhost:3000/api/opportunities/${newOpp.id}`, {
-        method: 'PUT',
+      const url = addMode ? postUrl : putUrl.replace(':id', newOpp.id);
+      fetch(url, {
+        method: addMode ? "POST" : "PUT",
         headers: {
           'Content-Type': 'application/json'
         },
@@ -111,8 +138,17 @@ export const EditOppModal = ({ opportunity, setSelectedOpp }) => {
   }
 
   const handleDropdownOptionClick = (type, e) => {
+    const newState = { ...newOpp };
+    if (type === 'opportunityType') {
+      if (e.target.innerText === 'Handover') newState.endDate = '';
+      if (e.target.innerText === 'Open') {
+        newState.startDate = '';
+        newState.endDate = '';
+      }
+    }
+
     setNewOpp({
-      ...newOpp,
+      ...newState,
       [type]: e.target.innerText
     });
     setShowStatusDropdown(false);
@@ -124,6 +160,7 @@ export const EditOppModal = ({ opportunity, setSelectedOpp }) => {
       ...newOpp,
       [type]: formatDate(e)
     });
+    setShowStartDateCalendar(false);
     setShowEndDateCalendar(false);
   }
 
@@ -132,7 +169,7 @@ export const EditOppModal = ({ opportunity, setSelectedOpp }) => {
     <Overlay>
       <Modal>
         <div>
-          <h1 style={{ textAlign: "center" }}>Edit Opportunity</h1>
+          <h1 style={{ textAlign: "center" }}>{`${addMode ? "Add" : "Edit"}`} Opportunity</h1>
           <GroupContainer>
             <p>Title</p>
             <StyledInput name="title" onChange={handleChange} value={newOpp.title}></StyledInput>
@@ -189,7 +226,7 @@ export const EditOppModal = ({ opportunity, setSelectedOpp }) => {
             <p>Start Date</p>
             <StyledInput
               value={newOpp.startDate || ''}
-              onClick={() => { setShowStartDateCalendar(true) }}
+              onClick={() => {!showEndDateCalendar && setShowStartDateCalendar(true) }}
             ></StyledInput>
             {showStartDateCalendar && <Calendar onChange={(e) => handleCalendarChange('startDate', e)} />}
           </GroupContainer>
@@ -199,7 +236,7 @@ export const EditOppModal = ({ opportunity, setSelectedOpp }) => {
             <p>End Date</p>
             <StyledInput
               value={newOpp.endDate || ''}
-              onClick={() => { setShowEndDateCalendar(true) }}
+              onClick={() => {!showStartDateCalendar && setShowEndDateCalendar(true)}}
             ></StyledInput>
             {showEndDateCalendar && <Calendar onChange={(e) => handleCalendarChange('endDate', e)} />}
           </GroupContainer>
@@ -207,7 +244,7 @@ export const EditOppModal = ({ opportunity, setSelectedOpp }) => {
         </div>
         <ButtonContainer>
           <button onClick={() => setSelectedOpp(null)}>Close</button>
-          <button onClick={handleSubmit}>Save</button>
+          <button disabled={isValid} onClick={handleSubmit}>Save</button>
         </ButtonContainer>
       </Modal>
     </Overlay>
