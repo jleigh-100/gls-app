@@ -27,6 +27,18 @@ router.get('/opportunities', (req, res) => {
             startDate: '2025-01-23',
             endDate: '2025-01-25',
         },
+        {
+            id: 3,
+            title: "Opportunity 3",
+            description: "Description 3",
+            status: 'Open',
+            customerName: 'Customer 3',
+            opportunityType: 'Open',
+            createdAt: '2025-01-23',
+            updatedAt: '2025-01-25',
+            startDate: '2025-01-23',
+            endDate: '2025-01-25',
+        },
     ]);
     // TODO: Link to database
 });

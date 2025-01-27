@@ -4,7 +4,7 @@ import { AddEditOppModal } from "../EditOppModal.jsx";
 
 const Container = styled.div`
   display: flex;
-  height: calc(100vh - 80px - 80px); // 80px for Header and 80px for Footer
+  height: calc(100vh - 180px);
 `;
 
 const StyledTable = styled.table`
@@ -16,16 +16,29 @@ const StyledTable = styled.table`
   }
   tr {
     height: 100px;
-    border-radius: 10px;
     &:not(:first-child) {
-      border-top: 10px solid white;
+      border-top: 1px solid black;
     }
+  &:nth-child(even) {
+    background-color: lightgrey;
+  }
+  &:last-child {
+    background-color: white;
   }
 `;
 
 const StyledRow = styled.tr`
   background-color: grey;
+  > td {
+    border: 1px solid black;
+  }
 `;
+
+const StyledAddButton = styled.button`
+  width: 100%;
+  height: 75%;
+`;
+
 
 const Body = () => {
   const [opportunities, setOpportunities] = useState([]);
@@ -73,7 +86,7 @@ const Body = () => {
             ))}
             <tr>
               <td colSpan={6}>
-                <button style={{ width: "100%", height: "75%" }} onClick={() => setSelectedOpp(true)}>Add new</button>
+                <StyledAddButton onClick={() => setSelectedOpp(true)}>Add new</StyledAddButton>
               </td>
             </tr>
           </tbody>
