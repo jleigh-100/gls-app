@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { AddEditOppModal } from "../AddEditOppModal.jsx";
+import { formatDate } from "../utils/index.jsx";
+import { useWindowDimensions } from "../../hooks/index.js";
 
 const Container = styled.div`
   display: flex;
@@ -11,6 +13,9 @@ const StyledTable = styled.table`
   border-collapse: collapse;
   height: ${props => props.opps < 10 ? `${props.opps * 100}px` : "100%"};
   width: 100%;
+  th {
+    width: 100px;
+  }
   td {
     text-align: center;
   }
@@ -49,6 +54,7 @@ const Body = () => {
   const [opportunities, setOpportunities] = useState([]);
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [openRow, setOpenRow] = useState(null);
+  const { width } = useWindowDimensions();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,16 +75,25 @@ const Body = () => {
     setOpenRow(openRow === index ? null : index);
   };
 
+  useEffect(() => {
+    if (selectedOpp) { // modal is open, remove scroll
+      document.body.classList.add("overflow-y-hidden")
+    } else {
+      document.body.classList.remove("overflow-y-hidden")
+    }
+  }, [selectedOpp]);
+
+
   return (
     <Container>
       <StyledTable opps={opportunities.length}>
         <thead>
           <tr>
             <th>Title</th>
-            <th>Description</th>
+            {width > 769 && <th>Description</th>}
             <th>Status</th>
-            <th>Customer Name</th>
-            <th>Opportunity Type</th>
+            <th>Customer</th>
+            <th>Type</th>
             <th>Edit</th>
           </tr>
         </thead>
@@ -87,7 +102,7 @@ const Body = () => {
             <React.Fragment key={opp._id}>
               <StyledRow onClick={() => toggleRow(index)}>
                 <td>{opp.title}</td>
-                <td>{opp.description}</td>
+                {width > 769 && <td>{opp.description}</td>}
                 <td>{opp.status}</td>
                 <td>{opp.customerName}</td>
                 <td>{opp.opportunityType}</td>
@@ -99,9 +114,10 @@ const Body = () => {
               <tr style={{ display: openRow === index ? 'table-row' : 'none' }}>
                 <td colSpan="7">
                   <CollapsibleSection isOpen={openRow === index}>
-                    <p><strong>Created At:</strong> {opp.createdAt || 'N/A'}</p>
-                    <p><strong>Updated At:</strong> {opp.updatedAt || 'N/A'}</p>
-                    <p><strong>Start Date:</strong> {opp.startDate || 'N/A'}</p>
+                    {width > 769 && <p><strong>Description:</strong>{opp.description}</p>}
+                    <p><strong>Created At:</strong> {formatDate(opp.createdAt) || 'N/A'}</p>
+                    <p><strong>Updated At:</strong> {formatDate(opp.updatedAt) || 'N/A'}</p>
+                    <p><strong>Start Date:</strong> {formatDate(opp.startDate) || 'N/A'}</p>
                   </CollapsibleSection>
                 </td>
               </tr>

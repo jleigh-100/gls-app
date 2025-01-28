@@ -1,12 +1,5 @@
-export const timeConverter = (time) => {
-  const hours = Math.floor(time / 60);
-  const minutes = time % 60;
-  if (hours === 0) return `${minutes} minutes`;
-  return `${hours} hours, ${minutes} minutes`;
-}
-
-
 export const formatDate = (dateString) => {
+  if (!dateString) return;
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = ('0' + (date.getMonth() + 1)).slice(-2);
