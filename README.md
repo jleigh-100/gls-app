@@ -3,7 +3,9 @@
 A simple web application that allows users to create, read, and update “opportunities” (requests from customers for help). The app includes:
 
 Frontend: A React-based UI
+
 Backend: A Node.js/Express API
+
 Database: MongoDB for data storage
 
 
