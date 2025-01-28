@@ -21,14 +21,16 @@ const StyledTable = styled.table`
   }
   tr {
     height: 100px;
+    background: white;
     &:not(:first-child) {
       border-top: 1px solid black;
     }
-  &:nth-child(odd) {
-    background: lightgrey;
-  }
-  &:last-child {
-    background: white;
+    &:nth-child(odd) {
+      background: lightgrey;
+    }
+    &:last-child {
+      background: white;
+    }
   }
 `;
 
@@ -41,10 +43,11 @@ const StyledRow = styled.tr`
 const StyledAddButton = styled.button`
   width: 100%;
   height: 75%;
+  cursor: pointer;
 `;
 
 const CollapsibleSection = styled.div`
-  display: ${props => (props.isOpen ? 'block' : 'none')};
+  display: block;
   padding: 10px;
   background-color: #f9f9f9;
   border-top: 1px solid #ddd;
@@ -54,12 +57,14 @@ const Body = () => {
   const [opportunities, setOpportunities] = useState([]);
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [openRow, setOpenRow] = useState(null);
+  const [sort, setSort] = useState('desc');
   const { width } = useWindowDimensions();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const opportunities = await fetch(`http://localhost:${window.location.port}/api/opportunities`);
+        const url = `http://localhost:${window.location.port}/api/opportunities?sort=${sort}`;
+        const opportunities = await fetch(url);
         const response = await opportunities.json();
         console.log(response);
         setOpportunities(response);
@@ -69,7 +74,7 @@ const Body = () => {
     };
     
     fetchData();
-  }, [selectedOpp]);
+  }, [selectedOpp, sort]);
 
   const toggleRow = (index) => {
     setOpenRow(openRow === index ? null : index);
@@ -94,7 +99,12 @@ const Body = () => {
             <th>Status</th>
             <th>Customer</th>
             <th>Type</th>
-            <th>Edit</th>
+            <th
+              onClick={() => setSort(sort === "asc" ? "desc" : "asc")}
+              style={{ cursor: "pointer" }}>
+              Created At ({sort})
+            </th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -106,25 +116,32 @@ const Body = () => {
                 <td>{opp.status}</td>
                 <td>{opp.customerName}</td>
                 <td>{opp.opportunityType}</td>
-                <td onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedOpp(opp)
-                  }}>Edit</td>
-              </StyledRow>
-              <tr style={{ display: openRow === index ? 'table-row' : 'none' }}>
-                <td colSpan="7">
-                  <CollapsibleSection isOpen={openRow === index}>
-                    {width > 769 && <p><strong>Description:</strong>{opp.description}</p>}
-                    <p><strong>Created At:</strong> {formatDate(opp.createdAt) || 'N/A'}</p>
-                    <p><strong>Updated At:</strong> {formatDate(opp.updatedAt) || 'N/A'}</p>
-                    <p><strong>Start Date:</strong> {formatDate(opp.startDate) || 'N/A'}</p>
-                  </CollapsibleSection>
+                <td>{formatDate(opp.createdAt)}</td>
+                <td
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedOpp(opp)
+                  }}
+                  style={{ cursor: "pointer" }}>
+                  Edit
                 </td>
-              </tr>
+              </StyledRow>
+              {openRow === index && 
+                <tr style={{ display: openRow === index ? 'table-row' : 'none' }}>
+                  <td colSpan="7">
+                    <CollapsibleSection >
+                      {width < 769 && <p><strong>Description:</strong>{opp.description}</p>}
+                      <p><strong>Updated At:</strong> {formatDate(opp.updatedAt) || 'N/A'}</p>
+                      <p><strong>Start Date:</strong> {formatDate(opp.startDate) || 'N/A'}</p>
+                    </CollapsibleSection>
+                  </td>
+                </tr>
+              }
             </React.Fragment>
           ))}
           <tr>
-            <td colSpan={7}>
+            <td></td>
+            <td colSpan={width < 769 ? 4 : 5}>
               <StyledAddButton onClick={() => setSelectedOpp(true)}>Add new</StyledAddButton>
             </td>
           </tr>

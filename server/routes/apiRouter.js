@@ -32,7 +32,8 @@ const Opportunity = mongoose.model('Opportunity', OpportunitySchema);
 // Example route to get all opportunities
 router.get('/opportunities', async (req, res) => {
   try {
-    const opportunities = await Opportunity.find();
+    const sort = req.query.sort === 'asc' ? 1 : -1; // Default to descending order
+    const opportunities = await Opportunity.find().sort({ createdAt: sort });
     res.json(opportunities);
   } catch (err) {
     res.status(500).json({ message: err.message });

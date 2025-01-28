@@ -141,6 +141,7 @@ export const AddEditOppModal = ({ opportunity, setSelectedOpp }) => {
   const handleDropdownOptionClick = (type, e) => {
     const newState = { ...newOpp };
     if (type === 'opportunityType') {
+      // clear dates if switching types to one that doesn't use them
       if (e.target.innerText === 'Handover') newState.endDate = '';
       if (e.target.innerText === 'Open') {
         newState.startDate = '';
@@ -226,17 +227,16 @@ export const AddEditOppModal = ({ opportunity, setSelectedOpp }) => {
           {newOpp.opportunityType !== 'Open' && <GroupContainer>
             <p>Start Date</p>
             <StyledInput
-              value={newOpp.startDate || ''}
+              value={formatDate(newOpp.startDate) || ''}
               onClick={() => {!showEndDateCalendar && setShowStartDateCalendar(true) }}
             ></StyledInput>
             {showStartDateCalendar && <Calendar onChange={(e) => handleCalendarChange('startDate', e)} />}
           </GroupContainer>
           }
-
           {newOpp.opportunityType === 'Cover' && <GroupContainer>
             <p>End Date</p>
             <StyledInput
-              value={newOpp.endDate || ''}
+              value={formatDate(newOpp.endDate) || ''}
               onClick={() => {!showStartDateCalendar && setShowEndDateCalendar(true)}}
             ></StyledInput>
             {showEndDateCalendar && <Calendar onChange={(e) => handleCalendarChange('endDate', e)} />}
