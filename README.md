@@ -13,8 +13,8 @@ Database: MongoDB for data storage
 
 ### Requirements
 
-- nvm [install link](https://github.com/nvm-sh/nvm) - to manage your node version
-- docker engine [install link](https://www.docker.com/products/docker-desktop/) - to run the database
+- nvm ([link](https://github.com/nvm-sh/nvm)) - to manage your node version
+- docker engine ([link](https://www.docker.com/products/docker-desktop/)) - to run the database
 
 ### Setting up
 
