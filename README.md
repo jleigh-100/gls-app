@@ -23,10 +23,10 @@ Database: MongoDB for data storage
   - Ask you which ports you wish to run the project on. Leaving these blank will use the defaults of:
     - Client: **3000**
     - Server: **27017**
-  - run `nvm install`, which will install and use the node version currentl in [`.nvmrc`](./.nvmrc)
+  - run `nvm install`, which will install and use the node version currently in [`.nvmrc`](./.nvmrc)
   - run `npm install`, which will install all dependancies for you
 
-  If you wish to update the ports used, either re-run the command, or update them in [`.env`](./.env);
+  If you wish to update the ports used, either re-run the command, or update them in [`.env`](./.env) before restarting both client and server.
 
 
 ## Running locally
