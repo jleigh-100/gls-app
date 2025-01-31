@@ -24,6 +24,7 @@ const OpportunitySchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   startDate: { type: Date },
+  endDate: { type: Date },
 });
 
 // Create Opportunity Model

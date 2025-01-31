@@ -17,6 +17,9 @@ const StyledTable = styled.table`
     width: 100px;
   }
   td {
+    &:not(:nth-child(n-1)) 
+      border: 1px solid black;
+    }
     text-align: center;
   }
   tr {
@@ -48,9 +51,7 @@ const StyledAddButton = styled.button`
 
 const CollapsibleSection = styled.div`
   display: block;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border-top: 1px solid #ddd;
+  padding: 7.5px;
 `;
 
 const Body = () => {
@@ -104,7 +105,7 @@ const Body = () => {
               style={{ cursor: "pointer" }}>
               Created At ({sort})
             </th>
-            <th></th>
+            <th>Options</th>
           </tr>
         </thead>
         <tbody>
@@ -132,7 +133,8 @@ const Body = () => {
                     <CollapsibleSection >
                       {width < 769 && <p><strong>Description:</strong>{opp.description}</p>}
                       <p><strong>Updated At:</strong> {formatDate(opp.updatedAt) || 'N/A'}</p>
-                      <p><strong>Start Date:</strong> {formatDate(opp.startDate) || 'N/A'}</p>
+                      {opp.startDate && <p><strong>Start Date:</strong> {formatDate(opp.startDate) || 'N/A'}</p>}
+                      {opp.endDate && <p><strong>End Date:</strong> {formatDate(opp.endDate) || 'N/A'}</p>}
                     </CollapsibleSection>
                   </td>
                 </tr>
