@@ -56,6 +56,11 @@ else # otherwise replace the port number
 fi
 echo "Ports have now been set to $newclientport and $newserverport."
 
+echo "Setting up Node Version Manager..."
+export NVM_DIR=$HOME/.nvm;
+source $NVM_DIR/nvm.sh;
+nvm install # use the correct node version
+
 echo "Installing dependencies..."
 echo "--------------------------------------------------------------------------"
 npm i # run an npm install to install dependencies
@@ -64,7 +69,5 @@ echo "Dependencies installed."
 echo ""
 echo "Setup complete."
 echo ""
-echo "You should not need to run this script again."
-echo ""
-echo "You should now run 'npm start' from the project's root to start the project."
+echo "You should now run 'nvm use' then 'npm start' from the project's root to run the project."
 echo ""
